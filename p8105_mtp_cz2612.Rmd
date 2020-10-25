@@ -7,7 +7,7 @@ output: github_document
 
 This is my solution to Midterm project.
 
-```{r setup, include = FALSE, message = FALSE}
+```{r setup, message = FALSE}
 library(tidyverse)
 library(readxl)
 library(patchwork)
@@ -39,14 +39,14 @@ Read dogweights dataset.
 
 ```{r dogweights_stat_df}
 dogweights_stat_df = 
-	read_xlsx(
+  read_xlsx(
 		"./data/dogweights_07sept2020.xlsx",
 		skip = 1) %>% 
-	janitor::clean_names() %>%
-  separate(raisin, into = c("raisin_lb", "raisin_oz"), sep = " ") %>% 
-  separate(simone, into = c("simone_lb", "simone_oz"), sep = " ") %>% 
-  separate(gagne, into = c("gagne_lb", "gagne_oz"), sep = " ") %>% 
-  separate(std, into = c("std_lb", "std_oz"), sep = " ") %>%  
+  janitor::clean_names() %>%
+  separate(raisin, into = c("raisin_lb", "raisin_oz"), sep = 2) %>% 
+  separate(simone, into = c("simone_lb", "simone_oz"), sep = 2) %>% 
+  separate(gagne, into = c("gagne_lb", "gagne_oz"), sep = 2) %>% 
+  separate(std, into = c("std_lb", "std_oz"), sep = 2) %>%  
   mutate(
     date = as.numeric(date),
     date = as.Date(date, origin = "1899-12-30"),
@@ -61,12 +61,13 @@ dogweights_stat_df =
 ```
 
 
+
 ```{r dogweights_notes_df}
 dogweights_notes_df = 
-	read_xlsx(
+  read_xlsx(
 		"./data/dogweights_07sept2020.xlsx",
 		skip = 1) %>% 
-	janitor::clean_names() %>%
+  janitor::clean_names() %>%
   select(date, notes = x6) %>% 
   mutate(
     date = as.numeric(date),
@@ -78,13 +79,34 @@ dogweights_notes_df =
 
 Export dataframes as CSVs.
 ```{r}
-  write_csv(dogweights_stat_df,"./data/dogweights_stat.csv")
-  write_csv(dogweights_notes_df,"./data/dogweights_notes.csv")
+write_csv(dogweights_stat_df,"./data/dogweights_stat.csv")
+write_csv(dogweights_notes_df,"./data/dogweights_notes.csv")
 ```
 
 
 
 ## Problem 2
+
+Make summary table.
+
+```{r}
+dogweights_stat_df %>% 
+  select(raisin_lb:gagne_lb) %>% 
+  pivot_longer(
+    raisin_lb:gagne_lb,
+    names_to = "name",
+    values_to = "weight"
+  ) %>% 
+  mutate(name = str_replace(name, "_lb$", "")) %>% 
+  group_by(name) %>% 
+  summarize(
+    weight_obs = sum(!is.na(weight)),
+    weight_avg = mean(weight, na.rm = TRUE),
+    weight_sd = sd(weight, na.rm = TRUE)
+  ) %>% 
+  knitr::kable(digits = 2)
+```
+There are `r n_distinct(pull(dogweights_stat_df,date))` unique dates included in the tidy dataset.
 
 
 
