@@ -34,7 +34,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 The raw data contain weights of three dogs of Jeff's friend. My goals are tidying the data, conducting some exploratory analysis, and making some plots to illustrate the data, in the hope of better understanding them.
 
-First, let's take a look at the original excel file. In order to import the data, the first row need to be omitted. We should also convert the date of weights from a character variable to a date variable. The abnormal date "s", introduced by data entry mistakes, should be dropped. There are also some data entry mistakes with weights variables. They are measured in Lbs and Oz, but both figures are stored in the same cell. Therefore, we need to separate these figures, and convert them into a single figure measured in Lbs.
+First, let's take a look at the original excel file. In order to import the data, the first row need to be omitted. We should also convert the date of weights from a character variable to a date variable. The abnormal date "s", introduced by data entry mistakes, should be dropped. There are also some data entry mistakes with weights variables. They are measured in Lbs and Oz, but both figures are stored in the same cell. Therefore, we need to separate these figures, and convert them into a single figure measured in Lbs. Since dog's weight shouldn't change very drastically in a short time, we assume that Raisin's weight on August 14, 2018 may also be a data entry mistake, and it might be 17 lbs instead of 7 lbs. However, without any evidence or additional information, we leave this value unchanged.
 
 Second, we import and tidy the dog weights data. After importing the data and cleaning the variable names, we convert the date and weights variables mentioned before. Moreover, the character variable notes are dropped, following the instructions. Furthermore, one observation with abnormal date and three observations without any non-missing weight values are deleted for subsequent analysis.
 
@@ -138,12 +138,12 @@ weight_distr_plot =
   ggplot(aes(x = name, y = weight, color = name)) +
   geom_boxplot() +
   labs(
-    title = "Dog’s weight distribution",
-    x = "Dog's name",
+    title = "Dog’s weights distribution",
+    x = "Name",
     y = "Weight (lb)",
     caption = "Data from the dogweights_07sept2020.xlsx file"
   ) +
-  scale_color_hue(name = "Dog's name")
+  scale_color_hue(name = "Name")
 
 weight_time_plot =
   dogweights_stat_df %>% 
@@ -164,17 +164,17 @@ weight_time_plot =
   geom_point() +
   geom_smooth() +
   labs(
-    title = "Dog’s weight over time",
+    title = "Dog’s weights over time",
     x = "Date",
     y = "Weight (lb)",
     caption = "Data from the dogweights_07sept2020.xlsx file"
   ) +
-  scale_color_hue(name = "Dog's name")
+  scale_color_hue(name = "Name")
 
 weight_distr_plot + weight_time_plot
 ```
 
-From the graphs, we could see that Raisin is the heaviest dog, while Simone is the lightest one. We could also find out that the weights of Raisin and Simone slowly decreased first, and then gradually increased. However, generally speaking, Gagne's weight was decreasing till its death. 
+From the graphs, we could see that Raisin is the heaviest dog, while Simone is the lightest one. We could also find out that the weights of Raisin and Simone slowly decreased first, and then gradually increased. However, generally speaking, Gagne's weight was decreasing till its death. There is also an outlier of Raisin's weight on August 14, 2018. Considering its weights on the nearest days, this outlier seems like a data entry mistake. Because the dog's weight shouldn't change so drastically in such a short time. However, we need more information to assess our assumptions.
 
 ```{r word_count, message = FALSE}
 wordcountaddin::text_stats("p8105_mtp_cz2612.Rmd")
