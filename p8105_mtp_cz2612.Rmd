@@ -97,7 +97,11 @@ dogweights_stat_df %>%
     names_to = "name",
     values_to = "weight"
   ) %>% 
-  mutate(name = str_replace(name, "_lb$", "")) %>% 
+  mutate(
+    name = str_replace(name, "raisin_lb", "Raisin"),
+    name = str_replace(name, "simone_lb", "Simone"),
+    name = str_replace(name, "gagne_lb", "Gagne"),
+    ) %>% 
   group_by(name) %>% 
   summarize(
     weight_obs = sum(!is.na(weight)),
@@ -112,4 +116,60 @@ There are `r n_distinct(pull(dogweights_stat_df,date))` unique dates included in
 
 ## Problem 3
 
+Make plots.
+
+```{r}
+weight_distr_plot =
+  dogweights_stat_df %>% 
+  select(date, raisin_lb:gagne_lb) %>% 
+  pivot_longer(
+    raisin_lb:gagne_lb,
+    names_to = "name",
+    values_to = "weight"
+  ) %>% 
+  mutate(
+    name = str_replace(name, "raisin_lb", "Raisin"),
+    name = str_replace(name, "simone_lb", "Simone"),
+    name = str_replace(name, "gagne_lb", "Gagne"),
+    name = as.factor(name),
+    name = fct_reorder(name, weight)
+  ) %>%
+  ggplot(aes(x = name, y = weight, color = name)) +
+  geom_boxplot() +
+  labs(
+    title = "Dog’s weight distribution",
+    x = "Dog's name",
+    y = "Weight (lb)",
+    caption = "Data from the dogweights_07sept2020.xlsx file"
+  ) +
+  scale_color_hue(name = "Dog's name")
+
+weight_time_plot =
+  dogweights_stat_df %>% 
+  select(date, raisin_lb:gagne_lb) %>% 
+  pivot_longer(
+    raisin_lb:gagne_lb,
+    names_to = "name",
+    values_to = "weight"
+  ) %>% 
+  mutate(
+    name = str_replace(name, "raisin_lb", "Raisin"),
+    name = str_replace(name, "simone_lb", "Simone"),
+    name = str_replace(name, "gagne_lb", "Gagne"),
+    name = as.factor(name),
+    name = fct_reorder(name, weight)
+  ) %>%
+  ggplot(aes(x = date, y = weight, color = name)) +
+  geom_point() +
+  geom_smooth() +
+  labs(
+    title = "Dog’s weight over time",
+    x = "Date",
+    y = "Weight (lb)",
+    caption = "Data from the dogweights_07sept2020.xlsx file"
+  ) +
+  scale_color_hue(name = "Dog's name")
+
+weight_distr_plot + weight_time_plot
+```
 
